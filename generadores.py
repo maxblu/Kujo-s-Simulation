@@ -5,9 +5,12 @@ def uniforme(a,b):
     x=random.randint(a,b)
     return x
 
-def normal(n,landa):
-    
+def normal(miu,landa):
+    return random.normalvariate(miu,landa)
     
 
 def exponencial(landa):
-    pass
+    return random.expovariate(landa)
+
+def bernoulli(p):
+    return random.randint(0,1)
