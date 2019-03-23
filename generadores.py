@@ -14,3 +14,4 @@ def exponencial(landa):
 
 def bernoulli(p):
     return random.randint(0,1)
+

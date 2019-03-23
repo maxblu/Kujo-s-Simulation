@@ -40,10 +40,9 @@ current_interval = 0
 
 
 
-# eficiencia_=[]
 
 
-def simula_kujos(eficiencia_=[],dias=30,cooks=3):
+def simula_kujos(dias=30):
     """Metodo que simula dias en la cocina del kojo para dos cocineros """
     means=[]
     eficiencias=[]
@@ -63,25 +62,22 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
         #variables de salida 
         A=[0] # A[i]  es tiempo de llegada del cliente i
         D={} # D[i] es tiempo de salida del cliente i
-            
+
         #lista de eventos
                 # donde ta es tiempo de arrivo del proximo cliente 
         ta=0            # ti es tiempo de partida del cliente que esta siendo atendido por chef 1 o 2
         t1=1              #nota pudiera en ves de llevar bools de los chef poner en uno a ti si no esta ocupado  
         t2=1
-        t3=1
         t=0
         n=0
         SS=[0]
-        t1=t2=t3=float('Infinity')
-        ti=[float('Infinity')]*cooks
+        t1=t2=float('Infinity')
         ta=t0
         timeInWait={}
         cantDuranteTiempo=[]
     #################################################Fin de la Inicializacion####################################
     #################################################Cuerpo de la Simulacion#####################################
 
-        # log("dia: "+ str(i))
         while n!=0   or  t<T:
             # log("Inicio while")
             # log(n)
@@ -89,14 +85,14 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
             # log([t0,T])
             # log(['CAntidad de clientes en el sistema ',n])
             # log(['VAriable SS del sistema ',SS])
-            log(ti)
+            # log([["ta ",ta],["t1 " ,t1],["t2  ",t2]])
 
             # input()
 
 
 
             #Caso 1
-            if ta == min([ta]+ti):
+            if ta == min((ta,t1,t2)):
                 # log('Entro en caso 1')
                 
                 if ta != float('Infinity'):
@@ -132,31 +128,39 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
 
                 #Elegir que es lo que quiere el cliente que puede ser atendido 0:sandwish 1:sushi 
                 tipo = bernoulli(0.5)
-                # log(ta)
-                cook_ready=cook_ocupied(ti)
-                # log(cook_ready )
+                
+
                 if SS==[0]:
-                    tem=[0]*(cooks-1)
-                    SS=[1,nA]+tem
+                    SS=[1,nA,0]
                     
                     if tipo ==0:
-                        ti[0]=t+uniforme(3,5)
+                        t1=t+uniforme(3,5)
                         timeInWait[nA]=t        
                     else:        
-                        ti[0]=t+uniforme(5,8)    
+                        t1=t+uniforme(5,8)    
                         timeInWait[nA]=t
-                elif cook_ready!=-1 :
-                    
-                    SS[0]+=1
-                    SS[cook_ready+1]=nA
+                elif SS[0]==1 and SS[1]!=0 and SS[2]==0:
+                    SS[0]=2
+                    SS[2]=nA
 
                     if tipo ==0:
-                        ti[cook_ready]=t+uniforme(3,5)
+                        t2=t+uniforme(3,5)
                         timeInWait[nA]=t        
                     else:        
-                        ti[cook_ready]=t+uniforme(5,8)
+                        t2=t+uniforme(5,8)
                         timeInWait[nA]=t    
 
+                elif SS[0]==1 and SS[1]==0 and SS[2]!=0:
+
+                    SS[0]=2
+                    SS[1]=nA
+
+                    if tipo ==0:
+                        t1=t+uniforme(3,5)
+                        timeInWait[nA]=t        
+                    else:        
+                        t1=t+uniforme(5,8)
+                        timeInWait[nA]=t          
                 else:
                     SS[0]+=1
                     SS.append(nA)
@@ -168,13 +172,11 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
                 # log([["ta ",ta],["t1 " ,t1],["t2  ",t2]])
                 # # input()    
                 
-            #Caso 2#Nota este caso es general para todas las partidas en especial este es para la partida de un cliente en el primer cook
-
-            if ti[0]==min([ta]+ti) and (ti[0]<=T or (ti[0]>T and n>0)):
+            #Caso 2
+            if t1<ta and t1 <=t2:
                 # log('Entro en caso 2')
-                t=ti[0]
+                t=t1
                 # log(["Actual time ",t])
-                #SS[1] porque esa posicion pernetence al cook ti[0] asi para cada posicion de SS .. example SS[i] pertenece al cook ti[i-1]
                 D[SS[1]]=t
                 log("Client #"+ str(SS[1])  + " gone at time: "+ str(t))
                 n-=1
@@ -182,25 +184,23 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
 
                 if SS[0]==1:
                     SS=[0]
-                    ti[0]=float('Infinity')
+                    t1=float('Infinity')
                 
-                elif SS[0]<=len(ti):
-                    SS[0]-=1
-                    SS[1]=0
-                    ti[0]=float('Infinity')
+                elif SS[0]==2:
+                    SS=[1,0,SS[2]]
+                    t1=float('Infinity')
                 else:
                     SS[0]-=1
-                    temp=SS[len(ti)+1]
-
-                    SS=[SS[0]]+[temp]+SS[2:len(ti)+1]+SS[len(ti)+2:len(SS)]
+                    temp=SS[3]
+                    SS=[SS[0]]+[temp]+[SS[2]]+SS[4:len(SS)]
 
                     tipo = bernoulli(0.5)
 
                     if tipo ==0:
-                        ti[0]=t+uniforme(3,5)
+                        t1=t+uniforme(3,5)
                         timeInWait[SS[1]]=t        
                     else:        
-                        ti[0]=t+uniforme(5,8)
+                        t1=t+uniforme(5,8)
                         timeInWait[SS[1]]=t   
 
                 # log("Caso 2 final")
@@ -208,91 +208,46 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
                 # log(['CAntidad de clientes en el sistema ',n])
                 # log(['VAriable SS del sistema ',SS])
                 # log([["ta ",ta],["t1 " ,t1],["t2  ",t2]])
-                # log(ti)
                 # input()
 
             #Caso 3
-            if ti[1]==min([ta]+ti) and (ti[1]<=T or (ti[1]>T and n>0)):
-                # log('Entro en caso 2')
-                t=ti[1]
+            if t2 < ta and t2 < t1:
+                # log('Entro en caso 3')
+                t=t2
                 # log(["Actual time ",t])
-                #SS[1] porque esa posicion pernetence al cook ti[0] asi para cada posicion de SS .. example SS[i] pertenece al cook ti[i-1]
                 D[SS[2]]=t
                 log("Client #"+ str(SS[2])  + " gone at time: "+ str(t))
                 n-=1
                 cantDuranteTiempo.append((n,t))
-
-                if SS[0]==1:
-                    SS=[0]
-                    ti[1]=float('Infinity')
-                
-                elif SS[0]<=len(ti):
-                    SS[0]-=1
-                    SS[2]=0
-                    ti[1]=float('Infinity')
-                else:
-                    SS[0]-=1
-                    temp=SS[len(ti)+1]
-                    SS=SS[0:2]+[temp]+SS[3:len(ti)+1]+SS[len(ti)+2:len(SS)]
-
-                    tipo = bernoulli(0.5)
-
-                    if tipo ==0:
-                        ti[1]=t+uniforme(3,5)
-                        timeInWait[SS[2]]=t        
-                    else:        
-                        ti[1]=t+uniforme(5,8)
-                        timeInWait[SS[2]]=t   
 
                 # log("Caso 3 final")
                 # log([t0,T])
                 # log(['CAntidad de clientes en el sistema ',n])
                 # log(['VAriable SS del sistema ',SS])
                 # log([["ta ",ta],["t1 " ,t1],["t2  ",t2]])
-                # log(ti)
+                # log(D)
                 # input()
-            if cooks==3:
-                #Caso 3
-                if ti[2]==min([ta]+ti) and (ti[2]<=T or (ti[2]>T and n>0)):
-                    # log('Entro en caso 2')
-                    t=ti[2]
-                    # log(["Actual time ",t])
-                    #SS[1] porque esa posicion pernetence al cook ti[0] asi para cada posicion de SS .. example SS[i] pertenece al cook ti[i-1]
-                    D[SS[3]]=t
-                    log("Client #"+ str(SS[2])  + " gone at time: "+ str(t))
-                    n-=1
-                    cantDuranteTiempo.append((n,t))
 
-                    if SS[0]==1:
-                        SS=[0]
-                        ti[2]=float('Infinity')
-                    
-                    elif SS[0]<=len(ti):
-                        SS[0]-=1
-                        SS[3]=0
-                        ti[2]=float('Infinity')
-                    else:
-                        SS[0]-=1
-                        temp=SS[len(ti)+1]
-                        SS=SS[0:3]+[temp]+SS[4:len(ti)+1]+SS[len(ti)+2:len(SS)]
+                if SS[0]==1:
+                    SS=[0]
+                    t2=float('Infinity')
+                
+                elif SS[0]==2:
+                    SS=[1,SS[1],0]
+                    t2=float('Infinity')
+                else:
+                    SS[0]-=1
+                    temp=SS[3]
+                    SS=SS[0:2]+[temp]+SS[4:len(SS)]
 
-                        tipo = bernoulli(0.5)
+                    tipo = bernoulli(0.5)
 
-                        if tipo ==0:
-                            ti[2]=t+uniforme(3,5)
-                            timeInWait[SS[3]]=t        
-                        else:        
-                            ti[2]=t+uniforme(5,8)
-                            timeInWait[SS[3]]=t   
-
-                    # log("Caso 4 final")
-                    # log([t0,T])
-                    # log(['CAntidad de clientes en el sistema ',n])
-                    # log(['VAriable SS del sistema ',SS])
-                    # log([["ta ",ta],["t1 " ,t1],["t2  ",t2]])
-                    # log(ti)
-                    # input()
-
+                    if tipo ==0:
+                        t2=t+uniforme(3,5)
+                        timeInWait[SS[2]]=t        
+                    else:        
+                        t2=t+uniforme(5,8)
+                        timeInWait[SS[2]]=t         
                 
     ###############################################Fin del cuerpo de la simulacion#####################################
     #################################################Calculos de salida para un dia#########################################
@@ -341,48 +296,9 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
         # plt.show()
     #################################################Fin de la simulacion total para un dia#####################################
     
-    log_info('Mean of waiting time: '+ str(statistics.mean(means)))
-    log_info('Mean of percent of efficienci: '+ str(statistics.mean(eficiencias)))
+    log('Mean of waiting time: '+ str(statistics.mean(means)))
+    log('Mean of percent of efficienci: '+ str(statistics.mean(eficiencias)))
 
+    print(dias)
     plt.plot(range(1,dias+1),eficiencias)
-        
-    
-
-
-
-
-
-def cook_ocupied(cookss):
-    """Saber si hay al menos un cocinero disponible y cual"""
-    for cook in cookss:
-        
-        if cook == float('Infinity'):
-            log(cook)
-            return cookss.index(cook)
-   
-    return -1    
-def keep_going(sample,d=1,k=31):
-    """Metodo para saber cuantas simulaciones tengo que hacer para estimar el 
-    parametro con el error que quiero """
-    log(sample)
-    if (statistics.stdev(sample)/math.sqrt(k))>= d:
-        return True
-    return False    
-
-
-def log(string):
-	logging.debug(str(string))
-def log_i(string):
-	logging.info(str(string))
-def log_info(string):
-    logging.info(string)
-
-if __name__ == "__main__":
-    # simula_kujos()
-    simula_kujos(cooks=2)
-    simula_kujos()
-
-    # plt.plot(range(efi[0][0]),efi[0][1])
     plt.show()
-
-    print ("FINISH")
