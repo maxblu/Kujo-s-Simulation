@@ -4,7 +4,7 @@ import math
 import matplotlib.pyplot as plt
 import statistics
 
-logging.basicConfig(format='Kojo\'s %(levelname)s system: %(message)s', level=logging.INFO)
+logging.basicConfig(format='Kojo\'s Cocina %(levelname)s system: %(message)s', level=logging.INFO)
 
 
 
@@ -45,18 +45,21 @@ current_interval = 0
 
 def simula_kujos(eficiencia_=[],dias=30,cooks=3):
     """Metodo que simula dias en la cocina del kojo para dos cocineros """
+    log_info("Simulating Kojo's Kitchen with "+ str(cooks)+" cooks")
     means=[]
+    means_of_number_of_customers=[]
+    n1=0
+    sandwisheros=[]
     eficiencias=[]
     i=1
-
+    
     while i <= dias:
         
     ####################################################Inicializacion##########################################
         #Variables del sistema
         nA=0
-        t0=600
-        t=600 
-        T=1260
+        t0=intervals[0]['start']
+        T=intervals[4]['end']
         SS=[0]
 
 
@@ -65,15 +68,9 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
         D={} # D[i] es tiempo de salida del cliente i
             
         #lista de eventos
-                # donde ta es tiempo de arrivo del proximo cliente 
-        ta=0            # ti es tiempo de partida del cliente que esta siendo atendido por chef 1 o 2
-        t1=1              #nota pudiera en ves de llevar bools de los chef poner en uno a ti si no esta ocupado  
-        t2=1
-        t3=1
         t=0
         n=0
         SS=[0]
-        t1=t2=t3=float('Infinity')
         ti=[float('Infinity')]*cooks
         ta=t0
         timeInWait={}
@@ -81,36 +78,20 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
     #################################################Fin de la Inicializacion####################################
     #################################################Cuerpo de la Simulacion#####################################
 
-        # log("dia: "+ str(i))
+        
         while n!=0   or  t<T:
-            # log("Inicio while")
-            # log(n)
-            # log(["Actual time ",t])
-            # log([t0,T])
-            # log(['CAntidad de clientes en el sistema ',n])
-            # log(['VAriable SS del sistema ',SS])
-            log(ti)
-
-            # input()
-
-
-
-            #Caso 1
+            
+            #Caso Llegada
             if ta == min([ta]+ti):
-                # log('Entro en caso 1')
-                
+                                
                 if ta != float('Infinity'):
                     t=ta
                     log("New client #"+ str(nA+1)  + " at time: "+ str(t))
                     
-
-                # log(["Actual time ",t])
                 nA=nA+1
                 n+=1
                 cantDuranteTiempo.append((n,t))
-                ##corregir esto preguntar en dependecia de que tiempo t estoy generar el proximo con el lambda que toca
-                
-                #si genero la proxima
+               
                 if t >=intervals[0]['start'] and t < intervals[0]['end']: 
                     ta=t+exponencial(intervals[0]['arrival_interval'])
                 elif t >=intervals[1]['start'] and t < intervals[1]['end']: 
@@ -132,9 +113,9 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
 
                 #Elegir que es lo que quiere el cliente que puede ser atendido 0:sandwish 1:sushi 
                 tipo = bernoulli(0.5)
-                # log(ta)
+
                 cook_ready=cook_ocupied(ti)
-                # log(cook_ready )
+
                 if SS==[0]:
                     tem=[0]*(cooks-1)
                     SS=[1,nA]+tem
@@ -142,6 +123,7 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
                     if tipo ==0:
                         ti[0]=t+uniforme(3,5)
                         timeInWait[nA]=t        
+                        
                     else:        
                         ti[0]=t+uniforme(5,8)    
                         timeInWait[nA]=t
@@ -152,7 +134,8 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
 
                     if tipo ==0:
                         ti[cook_ready]=t+uniforme(3,5)
-                        timeInWait[nA]=t        
+                        timeInWait[nA]=t   
+                        n1+=1     
                     else:        
                         ti[cook_ready]=t+uniforme(5,8)
                         timeInWait[nA]=t    
@@ -161,14 +144,8 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
                     SS[0]+=1
                     SS.append(nA)
 
-                # log("Caso uno final")
-                # log([t0,T])
-                # log(['CAntidad de clientes en el sistema ',n])
-                # log(['VAriable SS del sistema ',SS])
-                # log([["ta ",ta],["t1 " ,t1],["t2  ",t2]])
-                # # input()    
-                
-            #Caso 2#Nota este caso es general para todas las partidas en especial este es para la partida de un cliente en el primer cook
+                                
+            #Caso 1
 
             if ti[0]==min([ta]+ti) and (ti[0]<=T or (ti[0]>T and n>0)):
                 # log('Entro en caso 2')
@@ -199,24 +176,15 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
                     if tipo ==0:
                         ti[0]=t+uniforme(3,5)
                         timeInWait[SS[1]]=t        
+                        n1+=1
                     else:        
                         ti[0]=t+uniforme(5,8)
                         timeInWait[SS[1]]=t   
-
-                # log("Caso 2 final")
-                # log([t0,T])
-                # log(['CAntidad de clientes en el sistema ',n])
-                # log(['VAriable SS del sistema ',SS])
-                # log([["ta ",ta],["t1 " ,t1],["t2  ",t2]])
-                # log(ti)
-                # input()
-
-            #Caso 3
+            
+            #Caso 2
             if ti[1]==min([ta]+ti) and (ti[1]<=T or (ti[1]>T and n>0)):
-                # log('Entro en caso 2')
                 t=ti[1]
-                # log(["Actual time ",t])
-                #SS[1] porque esa posicion pernetence al cook ti[0] asi para cada posicion de SS .. example SS[i] pertenece al cook ti[i-1]
+                
                 D[SS[2]]=t
                 log("Client #"+ str(SS[2])  + " gone at time: "+ str(t))
                 n-=1
@@ -240,23 +208,16 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
                     if tipo ==0:
                         ti[1]=t+uniforme(3,5)
                         timeInWait[SS[2]]=t        
+                        n1+=1
                     else:        
                         ti[1]=t+uniforme(5,8)
                         timeInWait[SS[2]]=t   
 
-                # log("Caso 3 final")
-                # log([t0,T])
-                # log(['CAntidad de clientes en el sistema ',n])
-                # log(['VAriable SS del sistema ',SS])
-                # log([["ta ",ta],["t1 " ,t1],["t2  ",t2]])
-                # log(ti)
-                # input()
             if cooks==3:
                 #Caso 3
                 if ti[2]==min([ta]+ti) and (ti[2]<=T or (ti[2]>T and n>0)):
-                    # log('Entro en caso 2')
                     t=ti[2]
-                    # log(["Actual time ",t])
+                    
                     #SS[1] porque esa posicion pernetence al cook ti[0] asi para cada posicion de SS .. example SS[i] pertenece al cook ti[i-1]
                     D[SS[3]]=t
                     log("Client #"+ str(SS[2])  + " gone at time: "+ str(t))
@@ -280,30 +241,19 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
 
                         if tipo ==0:
                             ti[2]=t+uniforme(3,5)
-                            timeInWait[SS[3]]=t        
+                            timeInWait[SS[3]]=t       
+                            n1+=1 
                         else:        
                             ti[2]=t+uniforme(5,8)
                             timeInWait[SS[3]]=t   
-
-                    # log("Caso 4 final")
-                    # log([t0,T])
-                    # log(['CAntidad de clientes en el sistema ',n])
-                    # log(['VAriable SS del sistema ',SS])
-                    # log([["ta ",ta],["t1 " ,t1],["t2  ",t2]])
-                    # log(ti)
-                    # input()
-
-                
+                                 
     ###############################################Fin del cuerpo de la simulacion#####################################
     #################################################Calculos de salida para un dia#########################################
-        # log(len(A))
-        # log(len(D))
-
-        # log(A)
-        # log(D)
         
         #tiempo que pasa en la cola cada cliente
         diferences=[]
+        sandwisheros.append(n1)
+        n1=0
 
         for p in range(1,nA+1):
             diferences.append(timeInWait[p]-A[p])
@@ -323,26 +273,26 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
         log("Mean: "+str(mean_one_day))
         log("Eficiencia: "+str(eficiencia))
         eficiencias.append(eficiencia)
-        # print(i)
+       
+        means_of_number_of_customers.append(nA)
+
         if i>=30 and keep_going(eficiencias,k=i):
             dias+=1
         elif i>=30:
             log('Days simulated: '+str(dias))
             break         
         
+
         i+=1    
-        # plt.plot(diferences,[x for x in range(len(diferences))])
-        # plt.show()
-        # plt.hist(diferences)
-        # plt.plot([y for x,y in cantDuranteTiempo],[x for x,y in cantDuranteTiempo])
-        # plt.plot([x for x in diferences])
         
-        # plt.subplot(2,1,1)
-        # plt.show()
     #################################################Fin de la simulacion total para un dia#####################################
     
-    log_info('Mean of waiting time: '+ str(statistics.mean(means)))
-    log_info('Mean of percent of efficienci: '+ str(statistics.mean(eficiencias)))
+    log_info("Simulation finish with the following stats: ")
+    log_info('-Mean of waiting time: '+ str(statistics.mean(means)))
+    log_info('-Mean of percent of efficienci: '+ str(statistics.mean(eficiencias)))
+    log_info('-Number of days simulated: '+str(dias))
+    log_info('-Mean of the number of clients per day: '+str(statistics.mean(means_of_number_of_customers)))
+    log_info('Have a nice day!!!\n')
 
     plt.plot(range(1,dias+1),eficiencias)
         
@@ -383,6 +333,4 @@ if __name__ == "__main__":
     simula_kujos()
 
     # plt.plot(range(efi[0][0]),efi[0][1])
-    plt.show()
-
-    print ("FINISH")
+    # plt.show()

@@ -1,17 +1,20 @@
 
 import random
+import math
 
 def uniforme(a,b):
-    x=random.randint(a,b)
-    return x
+    # x=random.randint(a,b)
+    return random.uniform(a,b)
 
-def normal(miu,landa):
-    return random.normalvariate(miu,landa)
+def exponencial(lanbda):
+    U = random.uniform(0,1)
+    res =  -math.log(U) / lanbda
+
+    return res
     
-
-def exponencial(landa):
-    return random.expovariate(landa)
-
 def bernoulli(p):
-    return random.randint(0,1)
+    u=random.uniform(0,1)
+    if u<p:
+        return 0
+    return 1    
 
