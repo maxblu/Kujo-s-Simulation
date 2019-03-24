@@ -12,35 +12,30 @@ intervals = [
 				{
 					'start':600, 
 					'end':690,
-					'arrival_interval':1/16
+					'arrival_interval':1/10
 				},
 				{
 					'start':690, 
 					'end':810,
-                    'arrival_interval':1/2
+                    'arrival_interval':1/1
 				},
 				{
 					'start':810, 
 					'end':1020,
-                    'arrival_interval':1/13
+                    'arrival_interval':1/9
 				},
 				{
 					'start':1020, 
 					'end':1140,
-                    'arrival_interval':1/3
+                    'arrival_interval':1/1
 				},
 				{
 					'start':1140, 
 					'end':1260,
-                    'arrival_interval':1/10
+                    'arrival_interval':1/8
 				},
 			]	
 				
-current_interval = 0    
-
-
-
-# eficiencia_=[]
 
 
 def simula_kujos(eficiencia_=[],dias=30,cooks=3):
@@ -75,6 +70,8 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
         ta=t0
         timeInWait={}
         cantDuranteTiempo=[]
+        demand_interval=False
+        init=True
     #################################################Fin de la Inicializacion####################################
     #################################################Cuerpo de la Simulacion#####################################
 
@@ -87,6 +84,7 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
                 if ta != float('Infinity'):
                     t=ta
                     log("New client #"+ str(nA+1)  + " at time: "+ str(t))
+                    # input()
                     
                 nA=nA+1
                 n+=1
@@ -94,14 +92,25 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
                
                 if t >=intervals[0]['start'] and t < intervals[0]['end']: 
                     ta=t+exponencial(intervals[0]['arrival_interval'])
+                    if(cooks==3):
+                        demand_interval=False
                 elif t >=intervals[1]['start'] and t < intervals[1]['end']: 
                     ta=t+exponencial(intervals[1]['arrival_interval'])
+                    init=False
+                    if(cooks==3):
+                        demand_interval=True
                 elif t >=intervals[2]['start'] and t < intervals[2]['end']: 
                     ta=t+exponencial(intervals[2]['arrival_interval'])
+                    if(cooks==3):
+                        demand_interval=False
                 elif t >=intervals[3]['start'] and t < intervals[3]['end']: 
-                    ta=t+exponencial(intervals[3]['arrival_interval'])    
+                    ta=t+exponencial(intervals[3]['arrival_interval'])
+                    if(cooks==3):
+                        demand_interval=True    
                 else: 
-                    ta=t+exponencial(intervals[4]['arrival_interval'])        
+                    ta=t+exponencial(intervals[4]['arrival_interval'])   
+                    if(cooks==3):
+                        demand_interval=False     
                 
                 
                 
@@ -114,7 +123,7 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
                 #Elegir que es lo que quiere el cliente que puede ser atendido 0:sandwish 1:sushi 
                 tipo = bernoulli(0.5)
 
-                cook_ready=cook_ocupied(ti)
+                cook_ready=cook_ocupied(ti,inter=demand_interval )
 
                 if SS==[0]:
                     tem=[0]*(cooks-1)
@@ -150,23 +159,73 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
             if ti[0]==min([ta]+ti) and (ti[0]<=T or (ti[0]>T and n>0)):
                 # log('Entro en caso 2')
                 t=ti[0]
+                if(cooks==3):
+                    demand_interval=critic_time(t)
                 # log(["Actual time ",t])
                 #SS[1] porque esa posicion pernetence al cook ti[0] asi para cada posicion de SS .. example SS[i] pertenece al cook ti[i-1]
                 D[SS[1]]=t
                 log("Client #"+ str(SS[1])  + " gone at time: "+ str(t))
+                # input()
                 n-=1
                 cantDuranteTiempo.append((n,t))
+                
 
                 if SS[0]==1:
                     SS=[0]
                     ti[0]=float('Infinity')
-                
-                elif SS[0]<=len(ti):
+                elif cooks==2:
+                    if SS[0]<=len(ti):
+                        SS[0]-=1
+                        SS[1]=0
+                        ti[0]=float('Infinity')
+                    else:
+                        SS[0]-=1
+                        temp=SS[len(ti)+1]
+
+                        SS=[SS[0]]+[temp]+SS[2:len(ti)+1]+SS[len(ti)+2:len(SS)]
+
+                        tipo = bernoulli(0.5)
+
+                        if tipo ==0:
+                            ti[0]=t+uniforme(3,5)
+                            timeInWait[SS[1]]=t        
+                            n1+=1
+                        else:        
+                            ti[0]=t+uniforme(5,8)
+                            timeInWait[SS[1]]=t
+
+                elif demand_interval:
+                    if SS[0]<=len(ti):
+                        SS[0]-=1
+                        SS[1]=0
+                        ti[0]=float('Infinity')
+                    else:
+                        SS[0]-=1
+                        temp=SS[len(ti)+1]
+
+                        SS=[SS[0]]+[temp]+SS[2:len(ti)+1]+SS[len(ti)+2:len(SS)]
+
+                        tipo = bernoulli(0.5)
+
+                        if tipo ==0:
+                            ti[0]=t+uniforme(3,5)
+                            timeInWait[SS[1]]=t        
+                            n1+=1
+                        else:        
+                            ti[0]=t+uniforme(5,8)
+                            timeInWait[SS[1]]=t       
+
+                elif SS[0]<=len(ti)-1:
+                        SS[0]-=1
+                        SS[1]=0
+                        ti[0]=float('Infinity')
+                elif SS[0]>=3 and cooks==3 and two_off(ti)  :
                     SS[0]-=1
                     SS[1]=0
-                    ti[0]=float('Infinity')
+                    ti[0]=float('Infinity')      
                 else:
                     SS[0]-=1
+
                     temp=SS[len(ti)+1]
 
                     SS=[SS[0]]+[temp]+SS[2:len(ti)+1]+SS[len(ti)+2:len(SS)]
@@ -184,20 +243,67 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
             #Caso 2
             if ti[1]==min([ta]+ti) and (ti[1]<=T or (ti[1]>T and n>0)):
                 t=ti[1]
+                if(cooks==3):
+                    demand_interval=critic_time(t)
                 
                 D[SS[2]]=t
                 log("Client #"+ str(SS[2])  + " gone at time: "+ str(t))
+                # input()
                 n-=1
                 cantDuranteTiempo.append((n,t))
 
                 if SS[0]==1:
                     SS=[0]
                     ti[1]=float('Infinity')
-                
-                elif SS[0]<=len(ti):
+                elif cooks==2:
+                    if SS[0]<=len(ti):
+                        SS[0]-=1
+                        SS[2]=0
+                        ti[1]=float('Infinity')
+                    else:
+                        SS[0]-=1
+                        temp=SS[len(ti)+1]
+                        SS=SS[0:2]+[temp]+SS[3:len(ti)+1]+SS[len(ti)+2:len(SS)]
+
+                        tipo = bernoulli(0.5)
+
+                        if tipo ==0:
+                            ti[1]=t+uniforme(3,5)
+                            timeInWait[SS[2]]=t        
+                            n1+=1
+                        else:        
+                            ti[1]=t+uniforme(5,8)
+                            timeInWait[SS[2]]=t
+
+                elif demand_interval:
+                    if SS[0]<=len(ti):
+                        SS[0]-=1
+                        SS[2]=0
+                        ti[1]=float('Infinity')
+                    else:
+                        SS[0]-=1
+                        temp=SS[len(ti)+1]
+                        SS=SS[0:2]+[temp]+SS[3:len(ti)+1]+SS[len(ti)+2:len(SS)]
+
+                        tipo = bernoulli(0.5)
+
+                        if tipo ==0:
+                            ti[1]=t+uniforme(3,5)
+                            timeInWait[SS[2]]=t        
+                            n1+=1
+                        else:        
+                            ti[1]=t+uniforme(5,8)
+                            timeInWait[SS[2]]=t   
+
+
+                elif SS[0]<=len(ti)-1:
                     SS[0]-=1
                     SS[2]=0
                     ti[1]=float('Infinity')
+                elif SS[0]>=3 and cooks==3 and two_off(ti):
+                    SS[0]-=1
+                    SS[2]=0
+                    ti[1]=float('Infinity')        
                 else:
                     SS[0]-=1
                     temp=SS[len(ti)+1]
@@ -213,22 +319,49 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
                         ti[1]=t+uniforme(5,8)
                         timeInWait[SS[2]]=t   
 
-            if cooks==3:
+            if cooks==3 :
                 #Caso 3
                 if ti[2]==min([ta]+ti) and (ti[2]<=T or (ti[2]>T and n>0)):
                     t=ti[2]
+                    if(cooks==3):
+                        demand_interval=critic_time(t)
                     
                     #SS[1] porque esa posicion pernetence al cook ti[0] asi para cada posicion de SS .. example SS[i] pertenece al cook ti[i-1]
                     D[SS[3]]=t
-                    log("Client #"+ str(SS[2])  + " gone at time: "+ str(t))
+                    log("Client #"+ str(SS[3])  + " gone at time: "+ str(t))
+                    # input()
                     n-=1
                     cantDuranteTiempo.append((n,t))
 
                     if SS[0]==1:
                         SS=[0]
                         ti[2]=float('Infinity')
-                    
-                    elif SS[0]<=len(ti):
+                    elif demand_interval:
+                        if SS[0]<=len(ti):
+                            SS[0]-=1
+                            SS[3]=0
+                            ti[2]=float('Infinity')
+                        else:
+                            SS[0]-=1
+                            temp=SS[len(ti)+1]
+                            SS=SS[0:3]+[temp]+SS[4:len(ti)+1]+SS[len(ti)+2:len(SS)]
+
+                            tipo = bernoulli(0.5)
+
+                            if tipo ==0:
+                                ti[2]=t+uniforme(3,5)
+                                timeInWait[SS[3]]=t       
+                                n1+=1 
+                            else:        
+                                ti[2]=t+uniforme(5,8)
+                                timeInWait[SS[3]]=t       
+
+
+                    elif SS[0]<=len(ti)-1:
+                        SS[0]-=1
+                        SS[3]=0
+                        ti[2]=float('Infinity')
+                    elif SS[0]>=cooks and two_off(ti): 
                         SS[0]-=1
                         SS[3]=0
                         ti[2]=float('Infinity')
@@ -261,7 +394,7 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
         eficiencia=0
         moreThan5=[]
         for x in diferences: 
-            if x<=5:
+            if x>5:
                 moreThan5.append(x) 
 
         eficiencia = len(moreThan5)*100/nA
@@ -299,16 +432,18 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
     
 
 
-
-
-
-def cook_ocupied(cookss):
+def cook_ocupied(cookss,inter=False):
     """Saber si hay al menos un cocinero disponible y cual"""
+    c=0
     for cook in cookss:
         
         if cook == float('Infinity'):
+            if not inter :
+                return cookss.index(cook)
             log(cook)
-            return cookss.index(cook)
+            c+=1
+            if  inter or c==2: 
+                return cookss.index(cook)
    
     return -1    
 def keep_going(sample,d=1,k=31):
@@ -318,6 +453,28 @@ def keep_going(sample,d=1,k=31):
     if (statistics.stdev(sample)/math.sqrt(k))>= d:
         return True
     return False    
+def critic_time(t):
+    if t >=intervals[0]['start'] and t < intervals[0]['end']: 
+        return False
+    elif t >=intervals[1]['start'] and t < intervals[1]['end']: 
+        return True
+    elif t >=intervals[2]['start'] and t < intervals[2]['end']: 
+        return False
+    elif t >=intervals[3]['start'] and t < intervals[3]['end']: 
+        return True    
+    else: 
+        return False  
+def two_off(cookss):
+    c=0
+    for cook in cookss:
+        
+        if cook == float('Infinity'):
+            log(cook)
+            c+=1
+    if c==0:
+        return True
+
+    return  False   
 
 
 def log(string):
