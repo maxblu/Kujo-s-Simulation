@@ -32,8 +32,23 @@ El administrador de Kojo est\'{a} muy feliz con el negocio, pero ha estado recib
 \end{section}
 
 
-\begin{section} {Soluci\'{o}n}
-1  Solución al problema Kojo´s Kitchen
+\begin{section} {Ideas seguidas para la soluci\'{o}n}
+Este problema es muy similar al problema de atender a clientes con n servidores en paralelo con la diferencia de que todo el tiempo no est\'{a}n disponibles estos servidores, en nuestro problema los cocineros. Los clientes comenzaran a a llegar a la cafeter\'{i}a a pedir s\'{a}ndwich o sushi con siguiendo una distribuci\'{o}n exponencial como indica el ejercicio.
+
+Cuando un cliente llega uno de los cocineros lo atiende lo que equivale a generar el tiempo de salida del cliente del establecimiento. Esto se logra generando una variable aleatoria con distribuci\'{o}n uniforme(a, b) en dependencia si lo que quiere es s\'{a}ndwich o sushi, para saber que es lo que quiere el cliente se genera un v.a con distriuci\'{o}n bernoulli con p=0,5. Esto se podría variar en dependencia si las personas piden mas un producto u otro. 
+
+Otro caso ser\'{i} cuando el cliente llegue y no hay ning\'{u}n cocinero disponible en este caso se coloca en una cola y hasta que llegue el tiempo de salida de alguno de los que se están atendiendo y entonces se le da su tiempo de salida, siempre que sea el primero de la cola sino solo se acerca m\'{a}s a ser atendido pero sigue encolado. Se defini\'{o} el tiempo de espera del cliente como el tiempo en que sali\'{o} de la cola menos el tiempo en el que llego al establecimiento.
+
+Sea T el tiempo en el que el establecimiento cierra, todos los clientes que est\'{e}n en cola ser\'{a}n atendidos y los clientes que lleguen pasada esa hora no se dejar\'{a} que entren; as\'{i} el sistema podr\'{a} atender a los que falta y despu\'{e}s terminar.
+
+Para el an\'{a}lisis que se pide la idea es trabajar con la media del tiempo de demora de los clientes en varios d\'{i}as de simulaci\'{o}n de la cocina de Kujo. Esta cantidad de d\'{i}as la puede definir el usuario pero de no ser así se simulan 30 días inicialmente y luego se utiliza una f\'{o}rmula estad\'{i}stica para saber si con esa cantidad de d\'{i}as es suficiente para estimar el par\'{a}metro que se quiere con un error previamente definido en este caso se tomo error de 1 minuto. La f\'{o}rmula utilizada fue (formula). Donde d=1 S es la ra\'{i}z del estimador puntual para la varianza.    
+
+
+                 
+
+
+ 
+%Dentro de los elementos que hay que tener en cuenta es que los tiempos de los intervalos de llegadas de los clientes, que distribuyen de forma exponencial con parámetro lambda , este lambda fue tomado como 1/$\lambda$ para lograr tiempos en minutos mas realistas ya que la esperanza de la exponencial es 1/$\lambda$.                 
 
 \begin{subsection} {Descripci\'{o}n del modelo}
 \end{subsection}

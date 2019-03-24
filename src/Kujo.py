@@ -1,4 +1,4 @@
-from generadores import *
+from src.generadores import *
 import logging
 import math
 import matplotlib.pyplot as plt
@@ -12,33 +12,33 @@ intervals = [
 				{
 					'start':600, 
 					'end':690,
-					'arrival_interval':1/10
+					'arrival_interval':1/1.5   #10
 				},
 				{
 					'start':690, 
 					'end':810,
-                    'arrival_interval':1/1
+                    'arrival_interval':1/.75   #1
 				},
 				{
 					'start':810, 
 					'end':1020,
-                    'arrival_interval':1/9
+                    'arrival_interval':1/1.5     #9
 				},
 				{
 					'start':1020, 
 					'end':1140,
-                    'arrival_interval':1/1
+                    'arrival_interval':1/.75   #1
 				},
 				{
 					'start':1140, 
 					'end':1260,
-                    'arrival_interval':1/8
+                    'arrival_interval':1/1.5     #8
 				},
 			]	
 				
 
 
-def simula_kujos(eficiencia_=[],dias=30,cooks=3):
+def simula_kujos(dias=30,cooks=3,lambd1=18,lambd2=3,lambd3=14,lambd4=6,lambd5=11):
     """Metodo que simula dias en la cocina del kojo para dos cocineros """
     log_info("Simulating Kojo's Kitchen with "+ str(cooks)+" cooks")
     means=[]
@@ -47,6 +47,17 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
     sandwisheros=[]
     eficiencias=[]
     i=1
+    default=False
+    if dias == 30:
+        default=True
+
+    intervals[0]['arrival_interval']=1/lambd1
+    intervals[1]['arrival_interval']=1/lambd2
+    intervals[2]['arrival_interval']=1/lambd3
+    intervals[3]['arrival_interval']=1/lambd4
+    intervals[4]['arrival_interval']=1/lambd5
+
+
     
     while i <= dias:
         
@@ -71,7 +82,7 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
         timeInWait={}
         cantDuranteTiempo=[]
         demand_interval=False
-        init=True
+        # init=True
     #################################################Fin de la Inicializacion####################################
     #################################################Cuerpo de la Simulacion#####################################
 
@@ -389,12 +400,12 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
         n1=0
 
         for p in range(1,nA+1):
-            diferences.append(timeInWait[p]-A[p])
+            diferences.append(D[p]-A[p])
 
         eficiencia=0
         moreThan5=[]
         for x in diferences: 
-            if x>5:
+            if x>=5:
                 moreThan5.append(x) 
 
         eficiencia = len(moreThan5)*100/nA
@@ -409,11 +420,12 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
        
         means_of_number_of_customers.append(nA)
 
-        if i>=30 and keep_going(eficiencias,k=i):
-            dias+=1
-        elif i>=30:
-            log('Days simulated: '+str(dias))
-            break         
+        if default:
+            if i>=30 and keep_going(eficiencias,k=i):
+                dias+=1
+            elif i>=30:
+                log('Days simulated: '+str(dias))
+                break         
         
 
         i+=1    
@@ -422,7 +434,7 @@ def simula_kujos(eficiencia_=[],dias=30,cooks=3):
     
     log_info("Simulation finish with the following stats: ")
     log_info('-Mean of waiting time: '+ str(statistics.mean(means)))
-    log_info('-Mean of percent of efficienci: '+ str(statistics.mean(eficiencias)))
+    log_info('-Mean of percent of dissatisfied clients (more than 5 min): '+ str(statistics.mean(eficiencias)))
     log_info('-Number of days simulated: '+str(dias))
     log_info('-Mean of the number of clients per day: '+str(statistics.mean(means_of_number_of_customers)))
     log_info('Have a nice day!!!\n')
@@ -484,10 +496,48 @@ def log_i(string):
 def log_info(string):
     logging.info(string)
 
-if __name__ == "__main__":
-    # simula_kujos()
-    simula_kujos(cooks=2)
-    simula_kujos()
+# if __name__ == "__main__":
+#     # simula_kujos()
+#     cprint("Welcome to Kujo's Kitchen simulator",)
+#     print("Please introduce the values of the times between clientes arrival for intervals, separated by white space:")
+#     print("If you press enter the defaults will be loaded")
+#     lamdas=input()
+#     print("How many days do you want to simulate:")
+#     print("If you press enter the defaults will be loaded")
+#     days=30
+#     try:
+#         days =int(input())
+#     except Exception as identifier:
+#         days=30
+        
+    
+#     params=[]
+#     default=False
+#     try:
+#         for x in lamdas.split(' '):
+#             params.append(int(x))
+    
+#     except Exception as identifier:
+#         default=True
+    
+#     lenth=len(params)
+#     if not default:
+#         try:
+#             lamdas1=params[0]
+#             lamdas2=params[1]
+#             lamdas3=params[2]
+#             lamdas4=params[3]
+#             lamdas5=params[4]
+        
+#         except Exception  as identifier:
+#             print('Introduce the the five params')
 
-    # plt.plot(range(efi[0][0]),efi[0][1])
-    # plt.show()
+        
+        
+#         simula_kujos(dias=days ,cooks=2,lambd1=lamdas1,lambd2=lamdas2,lambd3=lamdas3,lambd4=lamdas4,lambd5=lamdas5)
+#         simula_kujos(dias=days, lambd1=lamdas1,lambd2=lamdas2,lambd3=lamdas3,lambd4=lamdas4,lambd5=lamdas5)
+#     else:
+#         simula_kujos(dias=days,cooks=2)
+#         simula_kujos(dias=days,cooks=3)
+#     # plt.plot(range(efi[0][0]),efi[0][1])
+#     plt.show()

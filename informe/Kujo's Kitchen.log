@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9) (preloaded format=pdflatex 2019.3.23)  23 MAR 2019 16:04
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9) (preloaded format=pdflatex 2019.3.23)  24 MAR 2019 15:24
 entering extended mode
 **Kujo's*Kitchen.tex
 ("D:\4to\simulacion\ProyectKujo's\informe\Kujo's Kitchen.tex"
@@ -61,13 +61,17 @@ Missing character: There is no Ã in font cmr10!
 Missing character: There is no ³ in font cmr10!
 Missing character: There is no Ã in font cmr10!
 Missing character: There is no º in font cmr10!
-Missing character: There is no Ã in font cmr10!
-Missing character: There is no ³ in font cmr10!
-Missing character: There is no Â in font cmr10!
-Missing character: There is no ´ in font cmr10!
  [1
 
 {C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}]
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no ­ in font cmr10!
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no ¡ in font cmr10!
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no ­ in font cmr10!
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no ­ in font cmr10!
 Missing character: There is no Ã in font cmbx12!
 Missing character: There is no ³ in font cmbx12!
 Missing character: There is no Ã in font cmbx12!
@@ -76,13 +80,13 @@ Missing character: There is no Ã in font cmr10!
 Missing character: There is no ³ in font cmr10!
 Missing character: There is no Ã in font cmr10!
 Missing character: There is no ³ in font cmr10!
- [2]
+ [2] [3]
 ("D:\4to\simulacion\ProyectKujo's\informe\Kujo's Kitchen.aux") ) 
 Here is how much of TeX's memory you used:
- 239 strings out of 494045
- 2800 string characters out of 3151211
- 52890 words of memory out of 3000000
- 3607 multiletter control sequences out of 15000+200000
+ 240 strings out of 494045
+ 2808 string characters out of 3151211
+ 53890 words of memory out of 3000000
+ 3608 multiletter control sequences out of 15000+200000
  7587 words of font info for 27 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
  23i,7n,17p,975b,199s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -91,9 +95,9 @@ katext/fonts/type1/public/amsfonts/cm/cmbx12.pfb><D:/programs/Mikatext/fonts/ty
 pe1/public/amsfonts/cm/cmmi10.pfb><D:/programs/Mikatext/fonts/type1/public/amsf
 onts/cm/cmr10.pfb><D:/programs/Mikatext/fonts/type1/public/amsfonts/cm/cmr12.pf
 b><D:/programs/Mikatext/fonts/type1/public/amsfonts/cm/cmr17.pfb>
-Output written on "Kujo's Kitchen.pdf" (2 pages, 66648 bytes).
+Output written on "Kujo's Kitchen.pdf" (3 pages, 69457 bytes).
 PDF statistics:
- 29 PDF objects out of 1000 (max. 8388607)
+ 32 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

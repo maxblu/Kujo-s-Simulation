@@ -1,4 +1,4 @@
-from generadores import *
+from src.generadores import *
 import logging
 import math
 import matplotlib.pyplot as plt
