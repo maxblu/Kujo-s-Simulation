@@ -4,7 +4,7 @@ import math
 import matplotlib.pyplot as plt
 import statistics
 
-logging.basicConfig(format='Kojo\'s Cocina %(levelname)s system: %(message)s', level=logging.INFO)
+logging.basicConfig(format='Kojo\'s Cocina %(levelname)s system: %(message)s', level=logging.DEBUG)
 
 
 
@@ -167,229 +167,94 @@ def simula_kujos(dias=30,cooks=3,lambd1=16,lambd2=2,lambd3=13,lambd4=3,lambd5=10
                                 
             #Caso 1
 
-            if ti[0]==min([ta]+ti) and (ti[0]<=T or (ti[0]>T and n>0)):
-                # log('Entro en caso 2')
-                t=ti[0]
-                if(cooks==3):
-                    demand_interval=critic_time(t)
-                # log(["Actual time ",t])
-                #SS[1] porque esa posicion pernetence al cook ti[0] asi para cada posicion de SS .. example SS[i] pertenece al cook ti[i-1]
-                D[SS[1]]=t
-                log("Client #"+ str(SS[1])  + " gone at time: "+ str(t))
-                # input()
-                n-=1
-                cantDuranteTiempo.append((n,t))
+            minimo=min([ta]+ti)
+            if minimo!=ta:
+                ind=ti.index(minimo)
                 
 
-                if SS[0]==1:
-                    SS=[0]
-                    ti[0]=float('Infinity')
-                elif cooks==2:
-                    if SS[0]<=len(ti):
-                        SS[0]-=1
-                        SS[1]=0
-                        ti[0]=float('Infinity')
-                    else:
-                        SS[0]-=1
-                        temp=SS[len(ti)+1]
-
-                        SS=[SS[0]]+[temp]+SS[2:len(ti)+1]+SS[len(ti)+2:len(SS)]
-
-                        tipo = bernoulli(0.5)
-
-                        if tipo ==0:
-                            ti[0]=t+uniforme(3,5)
-                            timeInWait[SS[1]]=t        
-                            n1+=1
-                        else:        
-                            ti[0]=t+uniforme(5,8)
-                            timeInWait[SS[1]]=t
-
-                elif demand_interval:
-                    if SS[0]<=len(ti):
-                        SS[0]-=1
-                        SS[1]=0
-                        ti[0]=float('Infinity')
-                    else:
-                        SS[0]-=1
-                        temp=SS[len(ti)+1]
-
-                        SS=[SS[0]]+[temp]+SS[2:len(ti)+1]+SS[len(ti)+2:len(SS)]
-
-                        tipo = bernoulli(0.5)
-
-                        if tipo ==0:
-                            ti[0]=t+uniforme(3,5)
-                            timeInWait[SS[1]]=t        
-                            n1+=1
-                        else:        
-                            ti[0]=t+uniforme(5,8)
-                            timeInWait[SS[1]]=t       
-
-                elif SS[0]<=len(ti)-1:
-                        SS[0]-=1
-                        SS[1]=0
-                        ti[0]=float('Infinity')
-                elif SS[0]>=3 and cooks==3 and two_off(ti)  :
-                    SS[0]-=1
-                    SS[1]=0
-                    ti[0]=float('Infinity')      
-                else:
-                    SS[0]-=1
-
-                    temp=SS[len(ti)+1]
-
-                    SS=[SS[0]]+[temp]+SS[2:len(ti)+1]+SS[len(ti)+2:len(SS)]
-
-                    tipo = bernoulli(0.5)
-
-                    if tipo ==0:
-                        ti[0]=t+uniforme(3,5)
-                        timeInWait[SS[1]]=t        
-                        n1+=1
-                    else:        
-                        ti[0]=t+uniforme(5,8)
-                        timeInWait[SS[1]]=t   
-            
-            #Caso 2
-            if ti[1]==min([ta]+ti) and (ti[1]<=T or (ti[1]>T and n>0)):
-                t=ti[1]
-                if(cooks==3):
-                    demand_interval=critic_time(t)
-                
-                D[SS[2]]=t
-                log("Client #"+ str(SS[2])  + " gone at time: "+ str(t))
-                # input()
-                n-=1
-                cantDuranteTiempo.append((n,t))
-
-                if SS[0]==1:
-                    SS=[0]
-                    ti[1]=float('Infinity')
-                elif cooks==2:
-                    if SS[0]<=len(ti):
-                        SS[0]-=1
-                        SS[2]=0
-                        ti[1]=float('Infinity')
-                    else:
-                        SS[0]-=1
-                        temp=SS[len(ti)+1]
-                        SS=SS[0:2]+[temp]+SS[3:len(ti)+1]+SS[len(ti)+2:len(SS)]
-
-                        tipo = bernoulli(0.5)
-
-                        if tipo ==0:
-                            ti[1]=t+uniforme(3,5)
-                            timeInWait[SS[2]]=t        
-                            n1+=1
-                        else:        
-                            ti[1]=t+uniforme(5,8)
-                            timeInWait[SS[2]]=t
-
-                elif demand_interval:
-                    if SS[0]<=len(ti):
-                        SS[0]-=1
-                        SS[2]=0
-                        ti[1]=float('Infinity')
-                    else:
-                        SS[0]-=1
-                        temp=SS[len(ti)+1]
-                        SS=SS[0:2]+[temp]+SS[3:len(ti)+1]+SS[len(ti)+2:len(SS)]
-
-                        tipo = bernoulli(0.5)
-
-                        if tipo ==0:
-                            ti[1]=t+uniforme(3,5)
-                            timeInWait[SS[2]]=t        
-                            n1+=1
-                        else:        
-                            ti[1]=t+uniforme(5,8)
-                            timeInWait[SS[2]]=t   
-
-
-                elif SS[0]<=len(ti)-1:
-                    SS[0]-=1
-                    SS[2]=0
-                    ti[1]=float('Infinity')
-                elif SS[0]>=3 and cooks==3 and two_off(ti):
-                    SS[0]-=1
-                    SS[2]=0
-                    ti[1]=float('Infinity')        
-                else:
-                    SS[0]-=1
-                    temp=SS[len(ti)+1]
-                    SS=SS[0:2]+[temp]+SS[3:len(ti)+1]+SS[len(ti)+2:len(SS)]
-
-                    tipo = bernoulli(0.5)
-
-                    if tipo ==0:
-                        ti[1]=t+uniforme(3,5)
-                        timeInWait[SS[2]]=t        
-                        n1+=1
-                    else:        
-                        ti[1]=t+uniforme(5,8)
-                        timeInWait[SS[2]]=t   
-
-            if cooks==3 :
-                #Caso 3
-                if ti[2]==min([ta]+ti) and (ti[2]<=T or (ti[2]>T and n>0)):
-                    t=ti[2]
+                if (ti[ind]<=T or (ti[ind]>T and n>0)):
+                    # log('Entro en caso 2')
+                    t=ti[ind]
                     if(cooks==3):
                         demand_interval=critic_time(t)
-                    
+                    # log(["Actual time ",t])
                     #SS[1] porque esa posicion pernetence al cook ti[0] asi para cada posicion de SS .. example SS[i] pertenece al cook ti[i-1]
-                    D[SS[3]]=t
-                    log("Client #"+ str(SS[3])  + " gone at time: "+ str(t))
+                    D[SS[ind+1]]=t
+                    log("Client #"+ str(SS[ind+1])  + " gone at time: "+ str(t))
                     # input()
                     n-=1
                     cantDuranteTiempo.append((n,t))
+                    
 
                     if SS[0]==1:
                         SS=[0]
-                        ti[2]=float('Infinity')
-                    elif demand_interval:
+                        ti[ind]=float('Infinity')
+                    elif cooks==2:
                         if SS[0]<=len(ti):
                             SS[0]-=1
-                            SS[3]=0
-                            ti[2]=float('Infinity')
+                            SS[ind+1]=0
+                            ti[ind]=float('Infinity')
                         else:
                             SS[0]-=1
                             temp=SS[len(ti)+1]
-                            SS=SS[0:3]+[temp]+SS[4:len(ti)+1]+SS[len(ti)+2:len(SS)]
+
+                            SS=SS[0:ind+1]+[temp]+SS[ind+2:len(ti)+1] + SS[len(ti)+2:len(SS)]
+                            tipo = bernoulli(0.5)
+
+                            if tipo ==0:
+                                ti[ind]=t+uniforme(3,5)
+                                timeInWait[SS[ind+1]]=t        
+                                n1+=1
+                            else:        
+                                ti[ind]=t+uniforme(5,8)
+                                timeInWait[SS[ind+1]]=t
+
+                    elif demand_interval:
+                        if SS[0]<=len(ti):
+                            SS[0]-=1
+                            SS[ind+1]=0
+                            ti[ind]=float('Infinity')
+                        else:
+                            SS[0]-=1
+                            temp=SS[len(ti)+1]
+
+                            SS=SS[0:ind+1]+[temp]+SS[ind+2:len(ti)+1] + SS[len(ti)+2:len(SS)]
 
                             tipo = bernoulli(0.5)
 
                             if tipo ==0:
-                                ti[2]=t+uniforme(3,5)
-                                timeInWait[SS[3]]=t       
-                                n1+=1 
+                                ti[ind]=t+uniforme(3,5)
+                                timeInWait[SS[ind+1]]=t        
+                                n1+=1
                             else:        
-                                ti[2]=t+uniforme(5,8)
-                                timeInWait[SS[3]]=t       
-
+                                ti[ind]=t+uniforme(5,8)
+                                timeInWait[SS[ind+1]]=t       
 
                     elif SS[0]<=len(ti)-1:
+                            SS[0]-=1
+                            SS[ind+1]=0
+                            ti[ind]=float('Infinity')
+                    elif SS[0]>=3 and cooks==3 and two_off(ti)  :
                         SS[0]-=1
-                        SS[3]=0
-                        ti[2]=float('Infinity')
-                    elif SS[0]>=cooks and two_off(ti): 
-                        SS[0]-=1
-                        SS[3]=0
-                        ti[2]=float('Infinity')
+                        SS[ind+1]=0
+                        ti[ind]=float('Infinity')      
                     else:
                         SS[0]-=1
-                        temp=SS[len(ti)+1]
-                        SS=SS[0:3]+[temp]+SS[4:len(ti)+1]+SS[len(ti)+2:len(SS)]
 
+                        temp=SS[len(ti)+1]
+
+                        SS=SS[0:ind+1]+[temp]+SS[ind+2:len(ti)+1] + SS[len(ti)+2:len(SS)]
                         tipo = bernoulli(0.5)
 
                         if tipo ==0:
-                            ti[2]=t+uniforme(3,5)
-                            timeInWait[SS[3]]=t       
-                            n1+=1 
+                            ti[ind]=t+uniforme(3,5)
+                            timeInWait[SS[ind+1]]=t        
+                            n1+=1
                         else:        
-                            ti[2]=t+uniforme(5,8)
-                            timeInWait[SS[3]]=t   
+                            ti[ind]=t+uniforme(5,8)
+                            timeInWait[SS[ind+1]]=t   
+                
+            
                                  
     ###############################################Fin del cuerpo de la simulacion#####################################
     #################################################Calculos de salida para un dia#########################################
@@ -400,7 +265,7 @@ def simula_kujos(dias=30,cooks=3,lambd1=16,lambd2=2,lambd3=13,lambd4=3,lambd5=10
         n1=0
 
         for p in range(1,nA+1):
-            diferences.append(timeInWait [p]-A[p])
+            diferences.append(D [p]-A[p])
 
 
         eficiencia=0
