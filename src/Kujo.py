@@ -264,7 +264,7 @@ def simula_kujos(dias=30,cooks_fix=2, cooks_extras=3,lambd1=16,lambd2=2,lambd3=1
         n1=0
 
         for p in range(1,nA+1):
-            diferences.append(D [p]-A[p])
+            diferences.append( timeInWait [p]-A[p])
 
 
         eficiencia=0
