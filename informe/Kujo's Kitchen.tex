@@ -41,44 +41,126 @@ Otro caso ser\'{i} cuando el cliente llegue y no hay ning\'{u}n cocinero disponi
 
 Sea T el tiempo en el que el establecimiento cierra, todos los clientes que est\'{e}n en cola ser\'{a}n atendidos y los clientes que lleguen pasada esa hora no se dejar\'{a} que entren; as\'{i} el sistema podr\'{a} atender a los que falta y despu\'{e}s terminar.
 
-Para el an\'{a}lisis que se pide la idea es trabajar con la media del tiempo de demora de los clientes en varios d\'{i}as de simulaci\'{o}n de la cocina de Kujo. Esta cantidad de d\'{i}as la puede definir el usuario pero de no ser así se simulan 30 días inicialmente y luego se utiliza una f\'{o}rmula estad\'{i}stica para saber si con esa cantidad de d\'{i}as es suficiente para estimar el par\'{a}metro que se quiere con un error previamente definido en este caso se tomo error de 1 minuto. La f\'{o}rmula utilizada fue (formula). Donde d=1 S es la ra\'{i}z del estimador puntual para la varianza.    
+Para el an\'{a}lisis que se pide la idea es trabajar con la media del tiempo de demora de los clientes en varios d\'{i}as de simulaci\'{o}n de la cocina de Kujo. Esta cantidad de d\'{i}as la puede definir el usuario pero de no ser así se simulan 30 días inicialmente y luego se utiliza una f\'{o}rmula estad\'{i}stica para saber si con esa cantidad de d\'{i}as es suficiente para estimar el par\'{a}metro que se quiere con un error previamente definido en este caso se tomo error de 1 minuto. La f\'{o}rmula utilizada fue (formula). Donde d=1, S es la ra\'{i}z del estimador puntual para la varianza y n = k la cantidad de d\'{i}as simulados hasta ese momento.    
 
-
+\end{section}
                  
 
 
  
 %Dentro de los elementos que hay que tener en cuenta es que los tiempos de los intervalos de llegadas de los clientes, que distribuyen de forma exponencial con parámetro lambda , este lambda fue tomado como 1/$\lambda$ para lograr tiempos en minutos mas realistas ya que la esperanza de la exponencial es 1/$\lambda$.                 
 
-\begin{subsection} {Descripci\'{o}n del modelo}
+\begin{section} {Modelo}
+	Aqu\'{i} se presentar\'{a} el modelo seguido para lograr la simulaci\'{o}n basada en eventos discretos donde las variables y los eventos toman un papel fundamental.  
+
+\begin{subsection} {Estados}
+	\begin{itemize}
+		\item LLegada de un cliente a la cocina de Kujo
+		\item Partida de un cliente que esta siendo atendido por el cocinero i  
+	\end{itemize}
 \end{subsection}
 
-\begin{subsection} {Variables}
+\begin{subsection} {Variables }
+		\begin{itemize}
+		\item t :			Tiempo actual en que se encuentra el sistema.
+		
+		\item T :	    	Tiempo en el cual cierra la tienda.
+		
+		\item n :			Cantidad de clientes totales que hay el sentido.
+		
+		\item nA: 			Cantidad de clientes que han llegado al sistema.
+		
+		\item cooks: 		N\'{u}mero de cocineros.
+		
+		\item ta: 			Tiempo de llegada.
+		
+		\item ti(i): 		Tiempo en que el cocinero i se desocupa.
+		
+		\item D(i):  		Tiempo de partida del cliente i.
+		
+		\item TimeInWait(i): Tiempo en que sale el cliente i de la cola. 
+		
+		\item $SS = (n, i1 , i2 ,... ,iN )$ (n clientes en el sistema, con i sub j  atendido por el cocinero j en este caso solo $j=(1,2,3)$. Si n$>$N los $n-N$ restantes est\'{a}n en cola). Si $S=(0)$ significa que el sistema est\'{a} vac\'{i}o. Si para algun i si $S[i]=0$ significa que el cocinero i esta disponible. 
+		 	 	  		 
+	\end{itemize}
 \end{subsection}
 
-\begin{subsection} {Inicialización }
+
+\begin{subsection} {Inicializaci\'{o}n }
+	\begin{itemize}
+		\item $t0=600$ (Esto corresponde a las 10am en minutos).
+		\item $T=1260$ (Equivale al tiempo de cierre)
+		\item $ti=[infinity]*cooks$ 
+		\item $ta=t0$
+		\item demand interval =False  (Variable para indicar el cambio de intervalo de uno normal a otro critico importante cundo se simula con tres cocineros)
+
+	\end{itemize}
+	
 \end{subsection}
 
-\begin{subsection} {Seudocódigo}
+\begin{subsection} {LLegada de Cliente}
+	El primer caso que queremos ver es el arribo al sistema de un cliente esto siempre va a ejecutarse siempre que sea el tiempo mas cercano al actual(t) y que sea posible que llegue alguien es decir que $ta<T$.
+	
+	Al ocurrir esto se aumenta nA as\'{i} como n ya que llego alguien nuevo al sistema. Luego hay tres opciones el sistema est\'{a} vac\'{i}o, hay al menos un servidor vac\'{i}o o todos est\'{a}n llenos.
+	
+	Si ocurre lo primero hacer $SS = (1, nA , 0 ,0)$ (poner al cliente en el 1er cocinero) y generar su tiempo de salida y hacer $ti(0) = t +$valor generado 
+	
+	Si ocurre lo segundo se pone el cliente en el lugar del cocinero disponible. Tener en cuenta que si estamos en el caso de tres cocineros hay que revisar en que intervalo estoy, ya que si no es el cr\'{i}tico tienen que haber al menos dos disponibles ya que un cocinero va dejar de trabajar. De nuevo se genera el tiempo de salida del cliente que se comenz\'{o} a atender.
+	
+	Si ocurre el tercero pues se encola al cliente al final de SS y se aumenta SS[0] en uno.
+	
+	Luego se genera el pr\'{o}ximo arribo haciendo ta= t + valor generado 
+	   
+	
 \end{subsection}
 
-\begin{subsection} {C\'{o}digo}
+\begin{subsection} {Partida de un cliente del cocinero i}
+	En este caso va a entrar si el tiempo de terminar que marca ti[i] es el pr\'{o}ximo en la lista de eventos en el tiempo es decir si es el menor de todos los posibles tiempos a moverse.
+	
+	Nos movemos a ese tiempo haciendo t=ti[i] disminuimos en 1 a n y hacemos también guardamos el tiempo de salida para el cliente que estaba siendo atendido por \'{e}l.
+	
+	Si el solo quedaba ese cliente en el sistema hacemos SS=[0] y ti[i]=infinito.
+	Si no hay clientes en cola hacer cero la posici\'{o}n de SS correspondiente a ese cliente y poner ti[i]=infinito
+	
+	Si existen clientes en cola simplemente poner el pr\'{o}ximo de la cola en la posici\'{o}n de SS del cocinero que termin\'{o} y generar la salida de ese cliente para actualizar ti[i] al igual que se hace en el caso de entrada. Tener en cuenta que si es para tres cocineros pasa lo mismo de que si estas en un intervalos que no es de demanda entonces no se coloca ese cocinero a trabajar simplemente se hace cero en SS y se pone a infinito ti[i].
+	   
 
-\begin{center}
-
-\end{center}
-
+	
+	
 \end{subsection}
+\begin{subsection} {Caso cierre}
+	Si no existe nadie en el sitema es decir n es igual a cero o SS=(0) y el pr\'{o}ximo tiempo a moverme es mayor que T pues termine el proceso de un d\'{i}a de simulaci\'{o}n 
+	
+	
+	
+\end{subsection}
+
+
 
 \end{section}
 
-
-\begin{section} {Aplicaci\'{o}n}
-2 Aplicación
-2.1 Vista Previa
-2.1 Descripción
-\end{section}
 
 \begin{section} {Resultados}
-\end{section}	
+	Con este proyecto se logr\'{o} mediante una simulaci\'{o}n basada en eventos discretos describir el funcionamiento de la cocina de Kujo. La aplicaci\'{o}n nos permite generar simulaciones para la cantidad de d\'{i}as escogidos con intervalos de llegada de los clientes tamb\'{i}en modificables y en todos los casos el poner un nuevo cocinero resulto factible en disminuir el por ciento de clientes insatisfechos. Tamb\'{i}en jugar con los par\'{a}metros de entrada pueda dar otras informaciones como son la media de espera o la necesidad de que aunque con tres empleados es mejor para un flujo determinado puede ser aun insuficiente para lograr un mejor servicio a clientes. Ya que aunque esperan menos los clientes siguen esperando mucho tiempo para alg\'{u}n flujo de llegada x. Tamb\'{i}en la aplicaci\'{o}n permite la escalabilidad del negocio probando con nuevas configuraciones antes de crecer y as\'{i} aprovechar al maximo la inversi\'{o}n. Finalmente mostramos una salida del programa para 100 d\'{i}s con los lambdas por defecto.
+	    
+\end{section}
+\begin{section} {Anexos}
+	\begin{figure}
+		\includegraphics{Corrida.png}
+		
+		
+		\caption{}
+	\end{figure}
+\begin{figure}
+		\includegraphics{figure_1.png}
+	
+	
+	
+	\caption{}
+\end{figure}
+
+
+	
+\end{section}
+	
 \end{document}

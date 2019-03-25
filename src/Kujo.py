@@ -12,33 +12,33 @@ intervals = [
 				{
 					'start':600, 
 					'end':690,
-					'arrival_interval':1/1.5   #10
+					'arrival_interval':1/10
 				},
 				{
 					'start':690, 
 					'end':810,
-                    'arrival_interval':1/.75   #1
+                    'arrival_interval':1/1
 				},
 				{
 					'start':810, 
 					'end':1020,
-                    'arrival_interval':1/1.5     #9
+                    'arrival_interval':1/9
 				},
 				{
 					'start':1020, 
 					'end':1140,
-                    'arrival_interval':1/.75   #1
+                    'arrival_interval':1/1
 				},
 				{
 					'start':1140, 
 					'end':1260,
-                    'arrival_interval':1/1.5     #8
+                    'arrival_interval':1/8
 				},
 			]	
 				
 
 
-def simula_kujos(dias=30,cooks=3,lambd1=18,lambd2=3,lambd3=14,lambd4=6,lambd5=11):
+def simula_kujos(dias=30,cooks=3,lambd1=16,lambd2=2,lambd3=13,lambd4=3,lambd5=10):
     """Metodo que simula dias en la cocina del kojo para dos cocineros """
     log_info("Simulating Kojo's Kitchen with "+ str(cooks)+" cooks")
     means=[]
@@ -400,12 +400,13 @@ def simula_kujos(dias=30,cooks=3,lambd1=18,lambd2=3,lambd3=14,lambd4=6,lambd5=11
         n1=0
 
         for p in range(1,nA+1):
-            diferences.append(D[p]-A[p])
+            diferences.append(timeInWait [p]-A[p])
+
 
         eficiencia=0
         moreThan5=[]
         for x in diferences: 
-            if x>=5:
+            if x>5:
                 moreThan5.append(x) 
 
         eficiencia = len(moreThan5)*100/nA
@@ -421,8 +422,10 @@ def simula_kujos(dias=30,cooks=3,lambd1=18,lambd2=3,lambd3=14,lambd4=6,lambd5=11
         means_of_number_of_customers.append(nA)
 
         if default:
+            # log_info("Es el default")
             if i>=30 and keep_going(eficiencias,k=i):
                 dias+=1
+                # log_info("Aumente k")
             elif i>=30:
                 log('Days simulated: '+str(dias))
                 break         
