@@ -4,7 +4,7 @@ import math
 import matplotlib.pyplot as plt
 import statistics
 
-logging.basicConfig(format='Kojo\'s Cocina %(levelname)s system: %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='Kojo\'s Cocina %(levelname)s system: %(message)s', level=logging.INFO)
 
 
 
@@ -38,9 +38,9 @@ intervals = [
 				
 
 
-def simula_kujos(dias=30,cooks=3,lambd1=16,lambd2=2,lambd3=13,lambd4=3,lambd5=10):
+def simula_kujos(dias=30,cooks_fix=2, cooks_extras=3,lambd1=16,lambd2=2,lambd3=13,lambd4=3,lambd5=10):
     """Metodo que simula dias en la cocina del kojo para dos cocineros """
-    log_info("Simulating Kojo's Kitchen with "+ str(cooks)+" cooks")
+    log_info("Simulating Kojo's Kitchen with  cooks")
     means=[]
     means_of_number_of_customers=[]
     n1=0
@@ -77,7 +77,7 @@ def simula_kujos(dias=30,cooks=3,lambd1=16,lambd2=2,lambd3=13,lambd4=3,lambd5=10
         t=0
         n=0
         SS=[0]
-        ti=[float('Infinity')]*cooks
+        ti=[float('Infinity')]*cooks_extras
         ta=t0
         timeInWait={}
         cantDuranteTiempo=[]
@@ -103,24 +103,23 @@ def simula_kujos(dias=30,cooks=3,lambd1=16,lambd2=2,lambd3=13,lambd4=3,lambd5=10
                
                 if t >=intervals[0]['start'] and t < intervals[0]['end']: 
                     ta=t+exponencial(intervals[0]['arrival_interval'])
-                    if(cooks==3):
+                    if(cooks_fix!=cooks_extras):
                         demand_interval=False
                 elif t >=intervals[1]['start'] and t < intervals[1]['end']: 
                     ta=t+exponencial(intervals[1]['arrival_interval'])
-                    init=False
-                    if(cooks==3):
+                    if(cooks_fix!=cooks_extras):
                         demand_interval=True
                 elif t >=intervals[2]['start'] and t < intervals[2]['end']: 
                     ta=t+exponencial(intervals[2]['arrival_interval'])
-                    if(cooks==3):
+                    if(cooks_fix!=cooks_extras):
                         demand_interval=False
                 elif t >=intervals[3]['start'] and t < intervals[3]['end']: 
                     ta=t+exponencial(intervals[3]['arrival_interval'])
-                    if(cooks==3):
+                    if(cooks_fix!=cooks_extras):
                         demand_interval=True    
                 else: 
                     ta=t+exponencial(intervals[4]['arrival_interval'])   
-                    if(cooks==3):
+                    if(cooks_fix!=cooks_extras):
                         demand_interval=False     
                 
                 
@@ -134,10 +133,10 @@ def simula_kujos(dias=30,cooks=3,lambd1=16,lambd2=2,lambd3=13,lambd4=3,lambd5=10
                 #Elegir que es lo que quiere el cliente que puede ser atendido 0:sandwish 1:sushi 
                 tipo = bernoulli(0.5)
 
-                cook_ready=cook_ocupied(ti,inter=demand_interval )
+                cook_ready=cook_ocupied(ti ,cooks_fix,cooks_extras,inter=demand_interval)
 
                 if SS==[0]:
-                    tem=[0]*(cooks-1)
+                    tem=[0]*(cooks_extras-1)
                     SS=[1,nA]+tem
                     
                     if tipo ==0:
@@ -175,7 +174,7 @@ def simula_kujos(dias=30,cooks=3,lambd1=16,lambd2=2,lambd3=13,lambd4=3,lambd5=10
                 if (ti[ind]<=T or (ti[ind]>T and n>0)):
                     # log('Entro en caso 2')
                     t=ti[ind]
-                    if(cooks==3):
+                    if(cooks_fix!=cooks_extras):
                         demand_interval=critic_time(t)
                     # log(["Actual time ",t])
                     #SS[1] porque esa posicion pernetence al cook ti[0] asi para cada posicion de SS .. example SS[i] pertenece al cook ti[i-1]
@@ -189,7 +188,7 @@ def simula_kujos(dias=30,cooks=3,lambd1=16,lambd2=2,lambd3=13,lambd4=3,lambd5=10
                     if SS[0]==1:
                         SS=[0]
                         ti[ind]=float('Infinity')
-                    elif cooks==2:
+                    elif cooks_fix ==cooks_extras:
                         if SS[0]<=len(ti):
                             SS[0]-=1
                             SS[ind+1]=0
@@ -234,7 +233,7 @@ def simula_kujos(dias=30,cooks=3,lambd1=16,lambd2=2,lambd3=13,lambd4=3,lambd5=10
                             SS[0]-=1
                             SS[ind+1]=0
                             ti[ind]=float('Infinity')
-                    elif SS[0]>=3 and cooks==3 and two_off(ti)  :
+                    elif SS[0]>=3 and two_off(ti,cooks_fix)  :
                         SS[0]-=1
                         SS[ind+1]=0
                         ti[ind]=float('Infinity')      
@@ -312,7 +311,7 @@ def simula_kujos(dias=30,cooks=3,lambd1=16,lambd2=2,lambd3=13,lambd4=3,lambd5=10
     
 
 
-def cook_ocupied(cookss,inter=False):
+def cook_ocupied(cookss,cooks_fix,cooks_extras,inter=False ):
     """Saber si hay al menos un cocinero disponible y cual"""
     c=0
     for cook in cookss:
@@ -322,7 +321,7 @@ def cook_ocupied(cookss,inter=False):
                 return cookss.index(cook)
             log(cook)
             c+=1
-            if  inter or c==2: 
+            if  inter or c==cooks_fix: 
                 return cookss.index(cook)
    
     return -1    
@@ -344,14 +343,14 @@ def critic_time(t):
         return True    
     else: 
         return False  
-def two_off(cookss):
+def two_off(cookss,cook_fix):
     c=0
     for cook in cookss:
         
-        if cook == float('Infinity'):
+        if cook != float('Infinity'):
             log(cook)
             c+=1
-    if c==0:
+    if c>=cook_fix+1:
         return True
 
     return  False   

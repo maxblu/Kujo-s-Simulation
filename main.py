@@ -42,10 +42,10 @@ if __name__ == "__main__":
 
         
         
-        Kujo.simula_kujos(dias=days ,cooks=2,lambd1=lamdas1,lambd2=lamdas2,lambd3=lamdas3,lambd4=lamdas4,lambd5=lamdas5)
-        Kujo.simula_kujos(dias=days, lambd1=lamdas1,lambd2=lamdas2,lambd3=lamdas3,lambd4=lamdas4,lambd5=lamdas5)
+        Kujo.simula_kujos(dias=days,cooks_fix=2,cooks_extras=2, lambd1=lamdas1,lambd2=lamdas2,lambd3=lamdas3,lambd4=lamdas4,lambd5=lamdas5)
+        Kujo.simula_kujos(dias=days,cooks_fix=2 ,cooks_extras=3, lambd1=lamdas1,lambd2=lamdas2,lambd3=lamdas3,lambd4=lamdas4,lambd5=lamdas5)
     else:
-        Kujo.simula_kujos(dias=days,cooks=2)
-        Kujo.simula_kujos(dias=days,cooks=3)
+        Kujo.simula_kujos(dias=days,cooks_fix=2,cooks_extras=2)
+        Kujo.simula_kujos(dias=days,cooks_fix=2,cooks_extras=3)
     # plt.plot(range(efi[0][0]),efi[0][1])
     Kujo.plt.show()
